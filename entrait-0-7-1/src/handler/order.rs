@@ -3,11 +3,9 @@ use std::sync::Arc;
 use axum::extract::{Path, State};
 use axum::http::StatusCode;
 use axum::Json;
-use entrait::Impl;
 use serde::Deserialize;
 use uuid::Uuid;
 
-use crate::app_state::AppState;
 use crate::domain::order::Order;
 use crate::domain::value_objects::{OrderId, ProductId, Quantity};
 use crate::error::AppError;
@@ -19,8 +17,8 @@ pub struct CreateOrderRequest {
     pub quantity: i32,
 }
 
-pub async fn create_order(
-    State(app): State<Arc<Impl<AppState>>>,
+pub async fn create_order<S: OrderService + Send + Sync + 'static>(
+    State(app): State<Arc<S>>,
     Json(req): Json<CreateOrderRequest>,
 ) -> Result<(StatusCode, Json<Order>), AppError> {
     let order = app
@@ -29,9 +27,9 @@ pub async fn create_order(
     Ok((StatusCode::CREATED, Json(order)))
 }
 
-pub async fn get_order(
+pub async fn get_order<S: OrderService + Send + Sync + 'static>(
     Path(id): Path<OrderId>,
-    State(app): State<Arc<Impl<AppState>>>,
+    State(app): State<Arc<S>>,
 ) -> Result<Json<Order>, AppError> {
     let order = app.find_order_by_id_svc(id).await?;
     Ok(Json(order))

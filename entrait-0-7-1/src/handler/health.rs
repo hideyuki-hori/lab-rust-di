@@ -2,15 +2,15 @@ use std::sync::Arc;
 
 use axum::extract::State;
 use axum::Json;
-use entrait::Impl;
 use serde_json::{json, Value};
 
-use crate::app_state::AppState;
 use crate::error::AppError;
-use crate::interface::health_service::HealthService;
+use crate::service::health_service_impl::HealthCheckService;
 
-pub async fn health_check(State(app): State<Arc<Impl<AppState>>>) -> Result<Json<Value>, AppError> {
-    let status = app.check_health().await?;
+pub async fn health_check<S: HealthCheckService + Send + Sync + 'static>(
+    State(app): State<Arc<S>>,
+) -> Result<Json<Value>, AppError> {
+    let status = app.check_health_svc().await?;
     Ok(Json(json!({
         "status": status.overall(),
         "services": {

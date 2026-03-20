@@ -9,6 +9,7 @@ use tokio::net::TcpListener;
 use crate::app_state::AppState;
 use crate::config::AppConfig;
 use crate::infrastructure;
+use crate::subscriber;
 
 use connections::Connections;
 
@@ -28,7 +29,7 @@ pub async fn run() -> anyhow::Result<()> {
         nats_client: connections.nats_client,
     }));
 
-    infrastructure::nats_order_subscriber::spawn(nats_client, app.clone());
+    subscriber::nats_order_subscriber::spawn(nats_client, app.clone());
 
     let router = router::create(app);
 

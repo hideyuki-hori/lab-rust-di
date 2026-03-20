@@ -3,10 +3,8 @@ use std::sync::Arc;
 use axum::extract::{Path, State};
 use axum::http::StatusCode;
 use axum::Json;
-use entrait::Impl;
 use serde::Deserialize;
 
-use crate::app_state::AppState;
 use crate::domain::product::Product;
 use crate::domain::value_objects::{Price, ProductDescription, ProductId, ProductName, Quantity};
 use crate::error::AppError;
@@ -21,23 +19,23 @@ pub struct CreateProductRequest {
     pub description: String,
 }
 
-pub async fn list_products(
-    State(app): State<Arc<Impl<AppState>>>,
+pub async fn list_products<S: ProductService + Send + Sync + 'static>(
+    State(app): State<Arc<S>>,
 ) -> Result<Json<Vec<Product>>, AppError> {
     let products = app.find_all().await?;
     Ok(Json(products))
 }
 
-pub async fn get_product(
+pub async fn get_product<S: ProductService + Send + Sync + 'static>(
     Path(id): Path<ProductId>,
-    State(app): State<Arc<Impl<AppState>>>,
+    State(app): State<Arc<S>>,
 ) -> Result<Json<Product>, AppError> {
     let product = app.find_by_id(id).await?;
     Ok(Json(product))
 }
 
-pub async fn create_product(
-    State(app): State<Arc<Impl<AppState>>>,
+pub async fn create_product<S: ProductService + Send + Sync + 'static>(
+    State(app): State<Arc<S>>,
     Json(req): Json<CreateProductRequest>,
 ) -> Result<(StatusCode, Json<Product>), AppError> {
     let name = ProductName::new(req.name).map_err(AppError::Conflict)?;

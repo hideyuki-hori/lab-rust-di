@@ -7,6 +7,7 @@ mod handler;
 mod infrastructure;
 mod interface;
 mod service;
+mod subscriber;
 #[cfg(test)]
 mod test_support;
 

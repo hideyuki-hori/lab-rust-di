@@ -68,7 +68,12 @@ mod integration_tests {
         assert_eq!(created.name.to_string(), "Test Product");
         assert_eq!(created.stock, Quantity(10));
 
-        let found = db.app.find_product_by_id(product.id).await.unwrap().unwrap();
+        let found = db
+            .app
+            .find_product_by_id(product.id)
+            .await
+            .unwrap()
+            .unwrap();
         assert_eq!(found.id, product.id);
         assert_eq!(found.name.to_string(), "Test Product");
     }
@@ -86,12 +91,7 @@ mod integration_tests {
         let db = TestDb::new().await;
 
         let p1 = sample_product();
-        let p2 = sample_product_with(
-            ProductId::new(),
-            "Second Product",
-            2000,
-            5,
-        );
+        let p2 = sample_product_with(ProductId::new(), "Second Product", 2000, 5);
 
         db.app.create_product(&p1).await.unwrap();
         db.app.create_product(&p2).await.unwrap();
@@ -106,9 +106,17 @@ mod integration_tests {
         let product = sample_product();
         db.app.create_product(&product).await.unwrap();
 
-        db.app.update_product_stock(product.id, Quantity(-3)).await.unwrap();
+        db.app
+            .update_product_stock(product.id, Quantity(-3))
+            .await
+            .unwrap();
 
-        let updated = db.app.find_product_by_id(product.id).await.unwrap().unwrap();
+        let updated = db
+            .app
+            .find_product_by_id(product.id)
+            .await
+            .unwrap()
+            .unwrap();
         assert_eq!(updated.stock, Quantity(7));
     }
 
@@ -116,7 +124,10 @@ mod integration_tests {
     async fn update_stock_not_found() {
         let db = TestDb::new().await;
 
-        let result = db.app.update_product_stock(ProductId::new(), Quantity(-1)).await;
+        let result = db
+            .app
+            .update_product_stock(ProductId::new(), Quantity(-1))
+            .await;
         assert!(result.is_err());
     }
 }

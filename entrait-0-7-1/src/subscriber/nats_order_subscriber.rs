@@ -1,16 +1,17 @@
 use std::sync::Arc;
 
 use chrono::Utc;
-use entrait::Impl;
 use tokio_stream::StreamExt;
 
-use crate::app_state::AppState;
 use crate::domain::audit_log::AuditLog;
 use crate::domain::order::OrderEvent;
 use crate::domain::value_objects::AuditLogId;
-use crate::interface::audit_log_repository::AuditLogRepository;
+use crate::service::audit_log_service_impl::AuditLogService;
 
-pub fn spawn(nats_client: async_nats::Client, app: Arc<Impl<AppState>>) {
+pub fn spawn<S: AuditLogService + Send + Sync + 'static>(
+    nats_client: async_nats::Client,
+    app: Arc<S>,
+) {
     tokio::spawn(async move {
         if let Err(e) = subscribe(nats_client, app).await {
             tracing::error!("Order subscriber failed: {e:?}");
@@ -18,9 +19,9 @@ pub fn spawn(nats_client: async_nats::Client, app: Arc<Impl<AppState>>) {
     });
 }
 
-async fn subscribe(
+async fn subscribe<S: AuditLogService + Send + Sync>(
     nats_client: async_nats::Client,
-    app: Arc<Impl<AppState>>,
+    app: Arc<S>,
 ) -> anyhow::Result<()> {
     let mut subscriber = nats_client.subscribe("orders.created").await?;
     tracing::info!("Subscribed to orders.created");
@@ -34,7 +35,7 @@ async fn subscribe(
                     payload: serde_json::to_value(&event).unwrap_or_default(),
                     created_at: Utc::now(),
                 };
-                if let Err(e) = app.create_audit_log(&audit_log).await {
+                if let Err(e) = app.create_audit_log_svc(&audit_log).await {
                     tracing::error!("Failed to save audit log: {e:?}");
                 }
             }
