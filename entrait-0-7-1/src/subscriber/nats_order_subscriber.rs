@@ -35,7 +35,7 @@ async fn subscribe<S: AuditLogService + Send + Sync>(
                     payload: serde_json::to_value(&event).unwrap_or_default(),
                     created_at: Utc::now(),
                 };
-                if let Err(e) = app.create_audit_log_svc(&audit_log).await {
+                if let Err(e) = app.create_audit_log_service(&audit_log).await {
                     tracing::error!("Failed to save audit log: {e:?}");
                 }
             }

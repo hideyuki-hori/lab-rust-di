@@ -7,14 +7,14 @@ use crate::interface::master_data_repository::MasterDataRepository;
 mod master_data_service {
     use super::*;
 
-    pub async fn get_master_data_svc(
+    pub async fn get_master_data_service(
         deps: &impl MasterDataRepository,
         key: &str,
     ) -> Result<Option<String>, AppError> {
         deps.get_master_data(key).await
     }
 
-    pub async fn set_master_data_svc(
+    pub async fn set_master_data_service(
         deps: &impl MasterDataRepository,
         key: &str,
         value: &str,
@@ -22,7 +22,7 @@ mod master_data_service {
         deps.set_master_data(key, value).await
     }
 
-    pub async fn get_all_master_data_svc(
+    pub async fn get_all_master_data_service(
         deps: &impl MasterDataRepository,
     ) -> Result<Vec<(String, String)>, AppError> {
         deps.get_all_master_data().await

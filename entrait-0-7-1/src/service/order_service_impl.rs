@@ -112,7 +112,7 @@ mod order_service {
         Ok(created)
     }
 
-    pub async fn find_order_by_id_svc(
+    pub async fn find_order_by_id_service(
         deps: &impl OrderRepository,
         id: OrderId,
     ) -> Result<Order, AppError> {
@@ -273,7 +273,7 @@ mod tests {
                 .returns(Ok(Some(expected))),
         );
 
-        let result = mock.find_order_by_id_svc(order_id).await.unwrap();
+        let result = mock.find_order_by_id_service(order_id).await.unwrap();
         assert_eq!(result.id, order_id);
         assert_eq!(result.product_id, product_id);
     }
@@ -288,7 +288,7 @@ mod tests {
                 .returns(Ok(None)),
         );
 
-        let result = mock.find_order_by_id_svc(order_id).await;
+        let result = mock.find_order_by_id_service(order_id).await;
         assert!(matches!(result, Err(AppError::NotFound(_))));
     }
 }

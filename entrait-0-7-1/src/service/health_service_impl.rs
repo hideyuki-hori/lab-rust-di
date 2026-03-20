@@ -7,7 +7,7 @@ use crate::interface::health_service::{HealthService, HealthStatus};
 mod health_check_service {
     use super::*;
 
-    pub async fn check_health_svc(deps: &impl HealthService) -> Result<HealthStatus, AppError> {
+    pub async fn check_health_service(deps: &impl HealthService) -> Result<HealthStatus, AppError> {
         deps.check_health().await
     }
 }

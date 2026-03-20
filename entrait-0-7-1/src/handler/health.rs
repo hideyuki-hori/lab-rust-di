@@ -10,7 +10,7 @@ use crate::service::health_service_impl::HealthCheckService;
 pub async fn health_check<S: HealthCheckService + Send + Sync + 'static>(
     State(app): State<Arc<S>>,
 ) -> Result<Json<Value>, AppError> {
-    let status = app.check_health_svc().await?;
+    let status = app.check_health_service().await?;
     Ok(Json(json!({
         "status": status.overall(),
         "services": {

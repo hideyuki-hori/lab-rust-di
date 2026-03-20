@@ -31,6 +31,6 @@ pub async fn get_order<S: OrderService + Send + Sync + 'static>(
     Path(id): Path<OrderId>,
     State(app): State<Arc<S>>,
 ) -> Result<Json<Order>, AppError> {
-    let order = app.find_order_by_id_svc(id).await?;
+    let order = app.find_order_by_id_service(id).await?;
     Ok(Json(order))
 }
